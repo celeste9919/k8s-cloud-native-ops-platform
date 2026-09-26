@@ -1,0 +1,23 @@
+stages:
+  - build
+  - push
+
+variables:
+  HARBOR: 172.25.254.101
+  PROJECT: openlab
+  IMAGE: ${HARBOR}/${PROJECT}/k8s-demo:${CI_COMMIT_SHORT_SHA}
+  HARBOR_USER: openlab
+  HARBOR_PASS: A123456a
+
+build:
+  stage: build
+  image: docker:latest
+  script:
+    - docker build -t ${IMAGE} .
+
+push:
+  stage: push
+  image: docker:latest
+  script:
+    - echo "${HARBOR_PASS}" | docker login ${HARBOR} -u ${HARBOR_USER} --password-stdin
+    - docker push ${IMAGE}
